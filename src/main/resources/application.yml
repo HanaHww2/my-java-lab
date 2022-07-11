@@ -8,3 +8,17 @@ logging:
 spring:
   messages:
     basename: messages
+#  security:
+#    user:
+#      name: dev
+#      password: dev
+
+springdoc:
+  paths-to-match: /**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
