@@ -1,0 +1,31 @@
+# default
+spring:
+  profiles:
+    active: local
+    group:
+      local: testdb, oauth
+
+---
+# local ??
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:h2:mem:testdb # db ?? ??
+  jpa:
+    defer-datasource-initialization: true # hibernate? ????? ? data.sql ???? ?? ??
+      #        show-sql: true
+    format_sql: true
+    hibernate:
+      ddl-auto: create-drop
+#  sql:
+#    init:
+#      data-locations: classpath:data-for-h2.sql
+  devtools:
+    livereload:
+      enabled: true
+logging:
+  level:
+    root: DEBUG
