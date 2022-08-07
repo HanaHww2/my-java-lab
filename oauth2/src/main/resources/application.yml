@@ -3,29 +3,59 @@ spring:
   profiles:
     active: local
     group:
-      local: testdb, oauth
+      prod: oauth, common, proddb
+      local: localdb, oauth, common
+      test: testdb, oauth, common
 
 ---
-# local ??
+# local 환경
 spring:
   config:
     activate:
-      on-profile: local
+      on-profile: localdb
 
   datasource:
-    url: jdbc:h2:mem:testdb # db ?? ??
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/testdb?serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 1234
+
+---
+# common 환경
+spring:
+  config:
+    activate:
+      on-profile: common
   jpa:
-    defer-datasource-initialization: true # hibernate? ????? ? data.sql ???? ?? ??
+    defer-datasource-initialization: true # hibernate가 초기화되기 전 data.sql 실행하는 것을 방지
       #        show-sql: true
     format_sql: true
     hibernate:
       ddl-auto: create-drop
-#  sql:
-#    init:
-#      data-locations: classpath:data-for-h2.sql
   devtools:
     livereload:
       enabled: true
 logging:
   level:
     root: DEBUG
+    org:
+      springframework:
+        security: DEBUG
+# cors 설정
+cors:
+  allowed-origins: 'http://localhost:3000'
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: '*'
+  max-age: 3600
+
+---
+# test 환경
+spring:
+  config:
+    activate:
+      on-profile: testdb
+  datasource:
+    url: jdbc:h2:mem:testdb # db 주소 고정
+    #  sql:
+    #    init:
+    #      data-locations: classpath:data-for-h2.sql # 시작할때 실행시킬 script

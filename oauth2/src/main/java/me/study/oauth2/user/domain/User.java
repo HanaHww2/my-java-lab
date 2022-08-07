@@ -17,33 +17,41 @@ import javax.validation.constraints.NotNull;
 public class User extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty
-    private String name;
-
-    @NotEmpty
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(unique = true)
+    private String name;
+
     @Column
-    private String picture;
+    private String imageUrl;
 
     @Enumerated(EnumType.STRING)
-    @NotNull
+    @NotNull // @NotEmpty 사용 불가
     private RoleType role;
 
+    @Enumerated(EnumType.STRING)
+    private AuthProvider authProvider;
+
+    private String githubUrl;
+    private String blogUrl;
+    private String refreshToken;
+
     @Builder
-    public User(String name, String email, String picture, RoleType role) {
+    public User(String name, String email, String imageUrl, RoleType role, AuthProvider authProvider) {
         this.name = name;
         this.email = email;
-        this.picture = picture;
+        this.imageUrl = imageUrl;
         this.role = role;
+        this.authProvider = authProvider;
     }
 
-    public User update(String name, String picture) {
+    public User update(String name, String imageUrl) {
         this.name = name;
-        this.picture = picture;
+        this.imageUrl = imageUrl;
         return this;
     }
 
@@ -51,16 +59,15 @@ public class User extends BaseTimeEntity {
         return this.role.getCode();
     }
 
-    @Getter
-    @RequiredArgsConstructor
-    public enum RoleType {
-
-        ADMIN("ROLE_ADMIN", "관리자"),
-        USER("ROLE_USER", "일반 사용자"),
-        GUEST("ROLE_GUEST", "게스트 권한");
-
-        private final String code;
-        private final String displayName;
-
-    }
+//    @Getter
+//    @RequiredArgsConstructor
+//    public enum RoleType {
+//
+//        ADMIN("ROLE_ADMIN", "관리자"),
+//        USER("ROLE_USER", "일반 사용자"),
+//        GUEST("ROLE_GUEST", "게스트 권한");
+//
+//        private final String code;
+//        private final String displayName;
+//    }
 }
