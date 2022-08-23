@@ -24,8 +24,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.security.Principal;
 
 @Slf4j
@@ -39,9 +41,21 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/auth/signup")
-    public CommonResult<User> signUpNewUser(@Valid @RequestBody UserDto userDto) throws DuplicateUserMailException {
-        User user = userService.register(userDto);
-        return new CommonResult<User>("User Registered Successfully", user);
+    public ResponseEntity<CommonResult<?>> signUpNewUser(@Valid @RequestBody UserDto userDto) {
+        try {
+            User user = userService.register(userDto);
+        } catch (DuplicateUserMailException e) {
+            // 에러 핸들링 추가 필요
+            e.printStackTrace();
+            throw e;
+        }
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/users/me")
+                .build()
+                .toUri();
+        return ResponseEntity.created(location)
+                .body(new CommonResult<>("User Registered Successfully", userDto));
+
     }
 
     @PostMapping(value = "/auth/signin")
@@ -70,7 +84,10 @@ public class UserController {
                 .email(signinReqDto.getEmail())
                 .build();
 
-        return new ResponseEntity<>(new CommonResult<>("Signed in Successfully", signinResDto), httpHeaders, HttpStatus.OK);
+        return ResponseEntity
+                .ok()
+                .headers(httpHeaders)
+                .body(new CommonResult<>("Signed in Successfully", signinResDto));
     }
 
     @PreAuthorize("hasRole('USER')")
